@@ -1,0 +1,79 @@
+\documentclass{report}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\begin{document}
+
+\title{Adaptive Cruise Control System Model}
+\author{Your Name}
+\date{\today}
+
+\maketitle
+
+\tableofcontents{}
+
+\chapter{Part 1 (a)}
+\section{Introduction}
+This part presents the derivation of a system model for an Adaptive Cruise Control (ACC) system. The model is based on the longitudinal dynamics of a vehicle and the dynamics of vehicle actuation. The model also considers the travel resistance which includes air drag, rolling resistance, acceleration resistance, and grading resistance.
+
+\section{Vehicle Dynamics Model}
+The longitudinal dynamics of a host vehicle is given by the equation:
+\begin{equation}
+    m\dot{v}_h = m a_f - r_{travel}
+\end{equation}
+where \(m\) is the vehicle mass, \(v_h\) is the vehicle speed, \(a_f\) is the traction force converted to acceleration, and \(r_{travel}\) is the travel resistance.
+
+The dynamics of a vehicle actuation including engine, transmission, or brake has nonlinear characteristics. The input/output relationship of the actuation dynamics is described as an ordinary differential equation:
+\begin{align}
+    \dot{x}_f & = f_{act}(x_f, u) \\
+    a_f       & = h_{act}(x_f)
+\end{align}
+where \(x_f \in \mathbb{R}^{n_f}\), \(u \in \mathbb{R}\) are respectively the state, the input of the actuation system. \(u\) is an acceleration command, i.e., a control input calculated by adaptive cruise controller. The output of the system is \(a_f\).
+
+The travel resistance \(r_{travel}\) contains several factors to resist its motion. A model of the resistive force is expressed as
+\begin{equation}
+    r_{travel} = r_{air} v_h^2 + r_{roll}(\dot{v}_h) + r_{accel} \dot{v}_h + r_{grad}(\theta)
+\end{equation}
+
+\section{State-Space Model for ACC System}
+To build a plant model for the ACC system design, two state variables are defined: inter-vehicle distance following error \(\Delta d = d - d_r\) and velocity following error \(\Delta v = v_p - v_h\). The \(d_r\) is determined based on the constant time headway policy given by
+\begin{equation}
+    d_r = T_{hw}v_h + d_0
+\end{equation}
+where \(T_{hw}\) is the constant time headway and \(d_0\) is the stopping distance for safety margin.
+
+Let us define the state variables of the plant as \(x = [x_1 \quad x_2 \quad x_3^T]^T \in \mathbb{R}^{2+n_f}\) with \(x_1 = \Delta d\), \(x_2 = \Delta v\) and \(x_3 = x_f\). Then, the state-space model is formulated as
+\begin{align}
+    \dot{x} & = f(x, u) + Gv + Hw \\
+    y       & = Cx + Jv
+\end{align}
+where
+\begin{align*}
+    f(x, u) & = \begin{bmatrix}
+                    x_2 - T_{hw}x_3 \\
+                    -h_{act}(x_f)   \\
+                    f_{act}(x_f, u)
+                \end{bmatrix}, \\
+    G       & = \begin{bmatrix}
+                    T_{hw}/m \\
+                    1/m      \\
+                    0
+                \end{bmatrix},           \\
+    H       & = \begin{bmatrix}
+                    0 \\
+                    1 \\
+                    0
+                \end{bmatrix},           \\
+    C       & = \begin{bmatrix}
+                    1 & 0 & 0 \\
+                    0 & 1 & 0 \\
+                    0 & 0 & 1
+                \end{bmatrix},           \\
+    J       & = \begin{bmatrix}
+                    0 \\
+                    0 \\
+                    -1/m
+                \end{bmatrix}
+\end{align*}
+where \(u \in \mathbb{R}\) and \(y = [\Delta d \quad \Delta v \quad \dot{v}_h]^T \in \mathbb{R}^3\) are the input and output of the plant and \(v = r_{travel}\) and \(w = \dot{v}_p\) represents disturbances into the plant.
+
+\end{document}
